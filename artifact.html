@@ -1,0 +1,422 @@
+<title>Stamp Mirror</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --leather-dark:#241611;
+    --leather-mid:#3a2416;
+    --leather-groove:#170d08;
+    --brass-hi:#f4e2a6;
+    --brass-base:#c9a45c;
+    --brass-low:#8a6a34;
+    --brass-edge:#4a3517;
+    --ink:#2a1c0e;
+    --text-warm:#ecdec0;
+    --text-dim:#b3a180;
+    --accent-thread:#c05a35;
+    --accent-thread-hi:#e07a52;
+    --void-tile:#170f0a;
+    --void-edge:#4a3527;
+    --steel-hi:#3a3a3f;
+    --steel-lo:#18181b;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse 900px 500px at 20% -10%, rgba(201,164,92,0.07), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 10%, rgba(0,0,0,0.35), transparent 60%),
+      var(--leather-dark);
+    color:var(--text-warm);
+    font-family:"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .page{
+    max-width:760px;
+    margin:0 auto;
+    padding:3rem 1.25rem 4rem;
+    display:flex;
+    flex-direction:column;
+    gap:1.9rem;
+  }
+
+  /* ---------- nameplate ---------- */
+  .nameplate{ text-align:center; display:flex; flex-direction:column; gap:.55rem; }
+  .rivet-row{ display:flex; align-items:center; justify-content:center; gap:.9rem; }
+  .rivet{
+    width:7px; height:7px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--brass-hi), var(--brass-low) 70%, var(--brass-edge));
+    box-shadow:0 1px 2px rgba(0,0,0,.6);
+  }
+  .nameplate h1{
+    margin:0;
+    font-family:"Oswald", ui-sans-serif, sans-serif;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    font-size:clamp(1.5rem, 4.2vw, 2.05rem);
+    color:var(--brass-hi);
+    text-shadow:0 1px 0 rgba(0,0,0,.5);
+  }
+  .nameplate p{
+    margin:0;
+    color:var(--text-dim);
+    font-size:.85rem;
+    letter-spacing:.02em;
+  }
+  .nameplate p a{ color:var(--brass-base); }
+
+  /* ---------- input field ---------- */
+  .field{ display:flex; flex-direction:column; gap:.5rem; }
+  .field-head{ display:flex; align-items:baseline; justify-content:space-between; }
+  .field-head label{
+    font-size:.72rem;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    color:var(--text-dim);
+    font-weight:600;
+  }
+  .clear-btn{
+    background:none; border:none; cursor:pointer;
+    font-family:"IBM Plex Sans", sans-serif;
+    font-size:.72rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    padding:.2rem .3rem;
+  }
+  .clear-btn:hover{ color:var(--accent-thread-hi); }
+  .clear-btn:focus-visible, input:focus-visible, details summary:focus-visible{
+    outline:2px solid var(--accent-thread-hi); outline-offset:2px;
+  }
+
+  #textInput{
+    width:100%;
+    background:var(--leather-groove);
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:.5rem;
+    padding:.9rem 1rem;
+    font-family:"IBM Plex Sans", sans-serif;
+    font-size:1.05rem;
+    text-transform:uppercase;
+    letter-spacing:.02em;
+    color:var(--text-warm);
+    box-shadow:inset 0 2px 5px rgba(0,0,0,.55);
+  }
+  #textInput::placeholder{ color:var(--text-dim); text-transform:none; }
+
+  .hint{ font-size:.78rem; color:var(--text-dim); line-height:1.5; }
+
+  /* ---------- alerts ---------- */
+  .alerts{ display:flex; flex-direction:column; gap:.4rem; }
+  .alerts:empty{ display:none; }
+  .alert{
+    font-size:.83rem;
+    line-height:1.4;
+    color:var(--text-warm);
+    background:rgba(192,90,53,.08);
+    border-left:3px solid var(--accent-thread);
+    padding:.5rem .7rem;
+    border-radius:0 .25rem .25rem 0;
+  }
+  .alert b{ color:var(--accent-thread-hi); font-weight:600; }
+
+  /* ---------- holder ---------- */
+  .holder{
+    position:relative;
+    background:linear-gradient(180deg, var(--steel-hi), var(--steel-lo));
+    border-radius:.7rem;
+    padding:1.15rem 1.4rem;
+    box-shadow:0 10px 24px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .endstop{
+    position:absolute;
+    top:.55rem; bottom:.55rem;
+    width:.55rem;
+    border-radius:.15rem;
+    background:linear-gradient(90deg, var(--brass-low), var(--brass-base) 50%, var(--brass-edge));
+    box-shadow:inset 0 0 3px rgba(0,0,0,.6);
+  }
+  .endstop.left{ left:0; border-radius:.15rem 0 0 .15rem; }
+  .endstop.right{ right:0; border-radius:0 .15rem .15rem 0; }
+
+  .row-block{ display:flex; flex-direction:column; gap:.5rem; }
+  .row-label{
+    font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:.68rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+  }
+  .track{ overflow-x:auto; padding:.15rem .05rem .5rem; }
+  .track::-webkit-scrollbar{ height:6px; }
+  .track::-webkit-scrollbar-thumb{ background:var(--brass-edge); border-radius:3px; }
+
+  .row-inner{
+    display:inline-flex;
+    gap:.32rem;
+    padding:.2rem;
+  }
+  .row-inner.mirror{ transform:scaleX(-1); }
+
+  .tile{
+    position:relative;
+    flex:none;
+    width:2.5rem;
+    height:3.05rem;
+    border-radius:.28rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:"Oswald", ui-sans-serif, sans-serif;
+    font-weight:700;
+    font-size:1.55rem;
+    color:var(--ink);
+    background:linear-gradient(155deg, var(--brass-hi), var(--brass-base) 45%, var(--brass-low) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.55),
+      inset 0 -4px 5px rgba(0,0,0,.3),
+      0 2px 3px rgba(0,0,0,.45);
+    text-shadow:0 1px 0 rgba(255,255,255,.3);
+  }
+  .tile.digit{ font-family:"IBM Plex Mono", monospace; font-size:1.3rem; }
+  .tile.symbol{ font-size:1.3rem; }
+
+  .tile.spacer{
+    width:1.15rem;
+    background:linear-gradient(180deg, #2a2a2d, #151517);
+    box-shadow:inset 0 2px 4px rgba(0,0,0,.6);
+  }
+
+  .tile.over{
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.4),
+      inset 0 -4px 5px rgba(0,0,0,.35),
+      0 0 0 2px var(--accent-thread),
+      0 2px 3px rgba(0,0,0,.45);
+  }
+  .tile.over::after{
+    content:"";
+    position:absolute;
+    top:-3px; right:-3px;
+    width:8px; height:8px;
+    border-radius:50%;
+    background:var(--accent-thread-hi);
+    box-shadow:0 0 0 2px var(--steel-lo);
+  }
+
+  .tile.unsupported{
+    background:var(--void-tile);
+    border:1px dashed var(--void-edge);
+    color:var(--text-dim);
+    box-shadow:inset 0 2px 4px rgba(0,0,0,.6);
+    font-size:1.2rem;
+  }
+
+  .seam{
+    position:relative;
+    height:1px;
+    margin:.2rem 0 .35rem;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.18) 15%, rgba(255,255,255,.18) 85%, transparent);
+  }
+  .seam .screw{
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:6px; height:6px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--brass-hi), var(--brass-low));
+    box-shadow:0 0 0 2px var(--steel-lo);
+  }
+  .seam .screw.l{ left:6%; }
+  .seam .screw.r{ right:6%; }
+
+  .mirror-caption{
+    font-size:.75rem;
+    color:var(--text-dim);
+    line-height:1.5;
+  }
+
+  /* ---------- reference ---------- */
+  details{
+    border-top:1px solid rgba(255,255,255,.08);
+    padding-top:1rem;
+  }
+  summary{
+    cursor:pointer;
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--text-dim);
+    font-weight:600;
+  }
+  .ref-grid{
+    margin-top:.9rem;
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(150px,1fr));
+    gap:.6rem 1rem;
+    font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:.78rem;
+    color:var(--text-dim);
+    font-variant-numeric:tabular-nums;
+  }
+  .ref-grid span b{ color:var(--brass-base); }
+</style>
+
+<div class="page">
+
+  <div class="nameplate">
+    <div class="rivet-row"><span class="rivet"></span><span class="rivet"></span></div>
+    <h1>Stamp Mirror</h1>
+    <p>Reverses a line for a 3/8&Prime; DIN&nbsp;Condensed brass set &mdash; like <a href="https://leatherstampmaker.com/products/137-piece-din-condensed-three-eighths-inch-brass-letter-stamp-set" target="_blank" rel="noopener">this 137-piece kit</a></p>
+    <div class="rivet-row"><span class="rivet"></span><span class="rivet"></span></div>
+  </div>
+
+  <div class="field">
+    <div class="field-head">
+      <label for="textInput">Text to stamp</label>
+      <button class="clear-btn" id="clearBtn" type="button">Clear</button>
+    </div>
+    <input id="textInput" type="text" maxlength="40" autocomplete="off" spellcheck="false"
+           value="T. Holloway – Saddlery" placeholder="TYPE YOUR LINE" />
+    <p class="hint">Shown in caps to match the set &mdash; it's uppercase-only. Lowercase is fine to type.</p>
+  </div>
+
+  <div class="alerts" id="alerts" aria-live="polite"></div>
+
+  <div class="holder">
+    <div class="endstop left"></div>
+    <div class="endstop right"></div>
+
+    <div class="row-block">
+      <span class="row-label">Load into holder, right to left</span>
+      <div class="track"><div class="row-inner mirror" id="rowMirror"></div></div>
+    </div>
+
+    <div class="seam"><span class="screw l"></span><span class="screw r"></span></div>
+
+    <div class="row-block">
+      <span class="row-label">Press &mdash; reads</span>
+      <div class="track"><div class="row-inner" id="rowNormal"></div></div>
+    </div>
+  </div>
+
+  <p class="mirror-caption">Each die is engraved backward so the impression reads forward. Match the shapes above against your stamps and set them right-to-left in the holder &mdash; press, and the line on the leather reads normally.</p>
+
+  <details>
+    <summary>What's in the 137-piece set</summary>
+    <div class="ref-grid">
+      <span><b>A E I O U</b> &times;4 each</span>
+      <span><b>other letters</b> &times;3 each</span>
+      <span><b>0&ndash;9</b> &times;3 each</span>
+      <span><b>: . , @ &amp; # / &ndash; !</b></span>
+      <span><b>blank spacers</b> &times;4</span>
+    </div>
+  </details>
+
+</div>
+
+<script>
+(function(){
+  const VOWELS = new Set(['A','E','I','O','U']);
+  const LETTER_MAX = {};
+  for (let i = 65; i <= 90; i++){
+    const c = String.fromCharCode(i);
+    LETTER_MAX[c] = VOWELS.has(c) ? 4 : 3;
+  }
+  const DIGIT_MAX = 3;
+  const SPACE_MAX = 4;
+  const SYMBOLS = new Set([':','.',',','@','&','#','/','–','!']);
+
+  const input = document.getElementById('textInput');
+  const clearBtn = document.getElementById('clearBtn');
+  const rowNormal = document.getElementById('rowNormal');
+  const rowMirror = document.getElementById('rowMirror');
+  const alertsEl = document.getElementById('alerts');
+
+  function analyze(raw){
+    const upper = raw.toUpperCase();
+    const counts = {};
+    const overflow = new Map();
+    const unsupported = new Set();
+    const tiles = [];
+
+    for (const original of upper){
+      let ch = original;
+      let type;
+
+      if (ch === ' '){
+        type = 'space';
+      } else if (ch >= 'A' && ch <= 'Z'){
+        type = 'letter';
+      } else if (ch >= '0' && ch <= '9'){
+        type = 'digit';
+      } else if (ch === '-'){
+        ch = '–';
+        type = 'symbol';
+      } else if (SYMBOLS.has(ch)){
+        type = 'symbol';
+      } else {
+        type = 'unsupported';
+      }
+
+      let over = false;
+      if (type === 'letter' || type === 'digit' || type === 'space'){
+        counts[ch] = (counts[ch] || 0) + 1;
+        const max = type === 'letter' ? LETTER_MAX[ch] : (type === 'digit' ? DIGIT_MAX : SPACE_MAX);
+        if (counts[ch] > max){
+          over = true;
+          overflow.set(ch, { count: counts[ch], max });
+        }
+      } else if (type === 'unsupported'){
+        unsupported.add(original);
+      }
+
+      tiles.push({ ch, type, over });
+    }
+
+    return { tiles, unsupported, overflow };
+  }
+
+  function buildTile(t){
+    const div = document.createElement('div');
+    div.className = 'tile ' + t.type + (t.over ? ' over' : '');
+    if (t.type === 'space'){
+      div.classList.add('spacer');
+    } else if (t.type === 'unsupported'){
+      div.textContent = '×';
+      div.title = 'Not in this set: "' + t.ch + '"';
+    } else {
+      div.textContent = t.ch;
+    }
+    return div;
+  }
+
+  function render(){
+    const { tiles, unsupported, overflow } = analyze(input.value);
+
+    rowNormal.innerHTML = '';
+    rowMirror.innerHTML = '';
+    tiles.forEach(t => {
+      rowNormal.appendChild(buildTile(t));
+      rowMirror.appendChild(buildTile(t));
+    });
+
+    const alerts = [];
+    if (unsupported.size){
+      const list = [...unsupported].map(c => '<b>"' + c + '"</b>').join(', ');
+      alerts.push('Not in this set: ' + list + ' &mdash; swap for a supported character.');
+    }
+    overflow.forEach((v, ch) => {
+      alerts.push('Need <b>' + v.count + '&times; “' + ch + '”</b>, the set only has ' + v.max + '.');
+    });
+    alertsEl.innerHTML = alerts.map(a => '<div class="alert">' + a + '</div>').join('');
+  }
+
+  input.addEventListener('input', render);
+  clearBtn.addEventListener('click', () => { input.value = ''; input.focus(); render(); });
+
+  render();
+})();
+</script>
