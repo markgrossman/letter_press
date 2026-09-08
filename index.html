@@ -222,21 +222,6 @@
     font-size:1.2rem;
   }
 
-  .seam{
-    position:relative;
-    height:1px;
-    margin:.2rem 0 .35rem;
-    background:linear-gradient(90deg, transparent, rgba(255,255,255,.18) 15%, rgba(255,255,255,.18) 85%, transparent);
-  }
-  .seam .screw{
-    position:absolute; top:50%; transform:translateY(-50%);
-    width:6px; height:6px; border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, var(--brass-hi), var(--brass-low));
-    box-shadow:0 0 0 2px var(--steel-lo);
-  }
-  .seam .screw.l{ left:6%; }
-  .seam .screw.r{ right:6%; }
-
   .mirror-caption{
     font-size:.75rem;
     color:var(--text-dim);
@@ -285,7 +270,7 @@
       <button class="clear-btn" id="clearBtn" type="button">Clear</button>
     </div>
     <input id="textInput" type="text" maxlength="40" autocomplete="off" spellcheck="false"
-           value="T. Holloway – Saddlery" placeholder="TYPE YOUR LINE" />
+           value="Oaksan Leather" placeholder="TYPE YOUR LINE" />
     <p class="hint">Shown in caps to match the set &mdash; it's uppercase-only. Lowercase is fine to type.</p>
   </div>
 
@@ -298,13 +283,6 @@
     <div class="row-block">
       <span class="row-label">Load into holder, right to left</span>
       <div class="track"><div class="row-inner mirror" id="rowMirror"></div></div>
-    </div>
-
-    <div class="seam"><span class="screw l"></span><span class="screw r"></span></div>
-
-    <div class="row-block">
-      <span class="row-label">Press &mdash; reads</span>
-      <div class="track"><div class="row-inner" id="rowNormal"></div></div>
     </div>
   </div>
 
@@ -337,7 +315,6 @@
 
   const input = document.getElementById('textInput');
   const clearBtn = document.getElementById('clearBtn');
-  const rowNormal = document.getElementById('rowNormal');
   const rowMirror = document.getElementById('rowMirror');
   const alertsEl = document.getElementById('alerts');
 
@@ -402,12 +379,8 @@
   function render(){
     const { tiles, unsupported, overflow } = analyze(input.value);
 
-    rowNormal.innerHTML = '';
     rowMirror.innerHTML = '';
-    tiles.forEach(t => {
-      rowNormal.appendChild(buildTile(t));
-      rowMirror.appendChild(buildTile(t));
-    });
+    tiles.forEach(t => rowMirror.appendChild(buildTile(t)));
 
     const alerts = [];
     if (unsupported.size){
